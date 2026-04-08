@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from typing import List, Optional
 import jose.jwt as jwt
 
-# Configurações de Segurança
 SECRET_KEY = "sua_chave_secreta_super_segura"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -13,11 +12,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 app = FastAPI(title="DIO Bank API")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# --- Banco de Dados Simulado ---
 db_users = {"joao": {"username": "joao", "password": "123", "balance": 1000.0}}
-db_transactions = [] # Lista de todas as transações
+db_transactions = [] 
 
-# --- Modelos Pydantic ---
 class TransactionBase(BaseModel):
     amount: float = Field(..., gt=0, description="O valor deve ser maior que zero")
 
@@ -30,7 +27,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-# --- Funções Auxiliares (Lógica de JWT) ---
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -47,7 +43,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except:
         raise HTTPException(status_code=401, detail="Token expirado ou inválido")
 
-# --- Endpoints ---
 
 @app.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
